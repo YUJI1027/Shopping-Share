@@ -1,0 +1,28 @@
+/* ブルー基調のカラーパレット */
+:root {
+    --primary-color: #007BFF; /* メインの青色 */
+    --secondary-color: #0056b3; /* セカンダリーの青色 */
+    --background-color: #f8f9fa; /* 背景色 */
+    --text-color: #343a40; /* テキスト色 */
+    --border-color: #dee2e6; /* ボーダー色 */
+}
+
+/* ボタンスタイル */
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* 残り件数のスタイル */
+.remaining {
+    color: var(--text-color);
+    font-weight: bold;
+}

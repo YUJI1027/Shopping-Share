@@ -1,0 +1,25 @@
+/* スマホ対応のブレークポイント */
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px; /* フォントサイズを小さく */
+    }
+
+    .remaining {
+        font-size: 16px; /* 残り件数のフォントサイズ調整 */
+    }
+
+    button {
+        width: 100%; /* ボタンを全幅に */
+        padding: 10px; /* パディングを調整 */
+        font-size: 18px; /* ボタンのフォントサイズ調整 */
+    }
+
+    .shopping-list {
+        padding: 10px; /* ショッピングリストのパディング調整 */
+    }
+
+    .add-item-form {
+        margin: 0; /* フォームのマージンをリセット */
+    }
+}

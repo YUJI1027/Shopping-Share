@@ -1,0 +1,8 @@
+:root {
+    --primary-color: #007bff; /* メインの青色 */
+    --secondary-color: #0056b3; /* セカンダリーの青色 */
+    --background-color: #f8f9fa; /* 背景色 */
+    --text-color: #212529; /* テキスト色 */
+    --border-color: #dee2e6; /* ボーダー色 */
+    --hover-color: rgba(0, 123, 255, 0.1); /* ホバー時の色 */
+}
