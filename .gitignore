@@ -18,6 +18,9 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 
+#Github Actions
+.firebase
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
