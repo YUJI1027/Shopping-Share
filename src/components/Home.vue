@@ -1,79 +1,121 @@
 <template>
-    <div class="page-container">
-        <Header />
-        <div v-if="isLoading" class="loading-over-lay">
-            <div class="spinner"></div>
+    <div class="min-h-screen bg-gradient-to-b  from-green-50 to-white px-4 py-5 flex flex-col gap-4 items-center box-border">
+        
+        <div 
+            v-if="isLoading" 
+            class="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-content"
+        >
+            <div class="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-500  animate-spin-custom"></div>
         </div>
 
-        <div class="top-bar card">
-            <div class="user-info">
-                <div class="user-name" @click="goProfile">
+        <div class="w-full max-w-2xl flex flex-col gap-4">
+            
+            <Header />
+            
+            <div class="w-full bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center justify-between">
+                <button class="text-base font-bold text-green-800 hover:text-green-500  transition cursor-pointer bg-transparent border-none"
+                        @click="goProfile">
                     {{ userName }}
-                </div>
-            </div>
-            <div class="actions">
-                <button @click="logout" class="logout-link">
+                </button>
+                <button @click="logout" 
+                        class="text-sm text-red-500 hover:underline cursor-pointer bg-transparent border-none">
                     ログアウト
                 </button>
             </div>
-        </div>
 
-        <div class="card content">
-            <section class="groups-section">
-                <h3 @click="goGroupSetting" class="section-title">グループ：{{ groupName || "未設定" }}</h3>
-                <div class="field">
-                    <label for="group-select" class="label-text">グループを選択　【グループ数：{{ userGroups.length }}】</label>
-                    <select id="group-select" v-model="groupId" @change="switchGroup($event.target.value)" class="input">
+            <div class="w-full bg-white rounded-2xl  px-4  py-4 shadow-sm border border-gray-100 flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <button @click="goGroupSetting"
+                            class="text-lg font-bold text-green-900 hover:text-green-500 transition cursor-pointer bg-transparent border-none"
+                    >
+                        {{ groupName || "未設定" }}   
+                    </button>
+                </div>
+                
+                <div class="flex flex-col gap-1.5">
+                    <label 
+                        for="group-select" 
+                        class="text-xs text-gray-500 font-medium"
+                    >
+                        グループを選択（{{ userGroups.length }}件）
+                    </label>
+                    <select 
+                        id="group-select" 
+                        v-model="groupId" 
+                        @change="switchGroup($event.target.value)" 
+                        class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                    >
                         <option value="" disabled>選択してください</option>
-                        <option v-for="group in userGroups" :key="group.id" :value="group.id" :selected="group.id === groupId">
+                        <option 
+                            v-for="group in userGroups" 
+                            :key="group.id" 
+                            :value="group.id" 
+                            :selected="group.id === groupId"
+                        >
                             {{ group.name }}
                         </option>
                     </select> 
                 </div>
-            </section>
 
-            <section class="form-section">
-                <div class="field">
-                    <input v-model="newGroupName" placeholder="新しいグループ名" class="input"/>
-                    <button @click="createNewGroup" class="btn-primary">グループ作成</button>
+                <div class="flex gap-2 pt-1">
+                    <input 
+                        v-model="newGroupName" 
+                        placeholder="新しいグループ名を入力" 
+                        class="flex-1 px-3 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-green-100 hover:opacity-90 shadow-md shadow-green-200 transition  cursor-pointer whitespace-nowrap"
+                    />
+                    <button 
+                        @click="createNewGroup" 
+                        class="px-4  py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-md shadow-green-200 transition cursor-pointer whitespace-nowrap"
+                    >
+                        グループ作成
+                    </button>
                 </div>
-            </section>
+            </div>
+
+            <div class="w-full bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center justify-between">
+                <span class="text-sm text-gray-500">買い物を共有しよう！</span>
+                <button 
+                    @click="copyShareLink" 
+                    class="text-sm font-semibold text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg transition cursor-pointer border border-green-100"
+                >
+                    🔗 リンクをコピー
+                </button>
+            </div>
+
+            <div class="w-full bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center gap-2">
+                <span class="text-sm  text-gray-500">残り</span>
+                <span class="text-xl font-black text-gray-900">{{ remainingCount }}</span>
+                <span class="text-sm  text-gray-500">件</span>
+            </div>
+
+            <ShoppingList 
+                :items="items"
+                @delete-item="deleteItem"
+                @toggle-item="toggleItem"
+                @edit-memo="editMemo"
+                @edit-item="startEdit"
+            />
         </div>
 
-        <button @click="showForm=true" class="fab" aria-label="アイテムを追加">＋</button>
-        <button @click="showForm=true" class="fab" aria-label="アイテムを追加">
-            <span class="fab-icon">＋</span>
-            <span class="fab-text">追加</span>
+        <button 
+            @click="showForm=true" 
+            class="fixed right-5 bottom-6 z-[1000] flex items-center gap-2 h-14 px-4 rounded-full bg-gradient-to-r  from-green-500 to-emerald-600 text-white font-bold shadow-green-300 hover:opacity-90 transition cursor-pointer md:rounded-xl md:h-12 md:px-5" 
+            aria-label="アイテムを追加"
+        >
+            <span class="text-xl leading-none">＋</span>
+            <span class="hidden md:inline text-sm">追加</span>
         </button>
 
-        <div class="group-actions card">
-            <button @click="copyShareLink" class="btn-ghost">共有リンクをコピーする</button>
-        </div>
-        
         <AddItemForm 
             v-if="showForm"
             :editingItem="editingItem"
             @add-item="AddItem"
             @close="closeForm"
         />
-        <div class="list-header card">
-            <div class="remaining-left">
-                <span class="remaining-label">残り</span>
-                <span class="remaining-count">{{ remainingCount }}件</span>
-            </div>
-        </div>
-
-        <ShoppingList 
-            :items="items"
-            @delete-item="deleteItem"
-            @toggle-item="toggleItem"
-            @edit-memo="editMemo"
-            @edit-item="startEdit"
-        />
 
         <ToastMessage 
-        :message="toastMessage"
-        :visible="showToast"
+            :message="toastMessage"
+            :visible="showToast"
         />
     </div>
 </template>
@@ -112,9 +154,9 @@ import ToastMessage from "./ToastMessage.vue"
 const router = useRouter()
 const route = useRoute()
 
-// ========================
+// ========
 // state
-// ========================
+// ========
 const user = ref(null)  // ユーザー情報を管理するためのref
 const userName = ref("") // ユーザー名の状態を管理するためのref
 const userGroups = ref([])  // 所属グループ取得のためのref
@@ -133,9 +175,9 @@ const showToast = ref(false) // トーストの表示状態を管理するため
 
 const isLoading = ref(false) // ローディング状態を管理するためのref
 
-// ========================
+// ==============
 // snapshot管理
-// ========================
+// ==============
 let unsubscribeItems = null
 let unsubscribeGroup = null
 
@@ -175,9 +217,9 @@ const reloadGroup = (gid) => {
     )
 }
 
-// ======================
+// ==========
 // 初期処理
-// ======================
+// ==========
 onMounted(() => {
     onAuthStateChanged(auth, async (firebaseUser) => {
 
@@ -215,9 +257,9 @@ watch(() => route.query.group, async (newGroupId)  => {
     reloadGroup(newGroupId)
 })
 
-// ======================
+// ==============
 // ユーザー初期化
-// ======================
+// ==============
 const initUser = async (firebase) => {
     const userRef = doc(db, "users", firebase.uid)
     const userDoc = await getDoc(userRef)
@@ -234,9 +276,9 @@ const initUser = async (firebase) => {
     userName.value = updateDoc.data().name
 }
 
-// ======================
+// =============
 // グループ取得
-// =====================
+// =============
 const loadUserGroups = async () => {
     const userDoc = await getDoc(doc(db, "users", user.value.uid))
     if (!userDoc.exists()) return
@@ -252,9 +294,9 @@ const loadUserGroups = async () => {
     }))
 }
 
-// ======================
+// ============
 // グループ作成
-// =====================
+// ============
 const createNewGroup = async () => {
     if (!newGroupName.value) {
         alert("グループ名を入力してください")
@@ -284,9 +326,9 @@ const createNewGroup = async () => {
     router.replace({ path: '/', query: { group: newGroupId } })
 }
 
-// ======================
+// ================
 // グループ切り替え
-// ====================
+// ================
 const switchGroup = async (gid) => {
     if  (gid === groupId.value) return
 
@@ -296,9 +338,9 @@ const switchGroup = async (gid) => {
     displayToast("🔄 グループを切り替えました")
 }
 
-// ======================
+// ==============
 // 初回参加判定
-// =====================
+// ==============
 const ensureJoinedGroup = async (gid) => {
     if (!user.value) return
 
@@ -326,9 +368,9 @@ const ensureJoinedGroup = async (gid) => {
     }
 }
 
-// ======================
+// ===============
 // トースト表示関数
-// ======================
+// ===============
 const displayToast = (message) => {
     toastMessage.value = message
     showToast.value = true
@@ -338,9 +380,9 @@ const displayToast = (message) => {
     },  3000)
 }
 
-// ======================
+// ==================
 // アイテム追加/更新
-// =====================
+// ==================
 const AddItem = async (itemName, quantity, memo) => {
     if (!itemName) return
     
@@ -394,17 +436,17 @@ const startEdit = (item) => {
     showForm.value = true
 }
 
-// ========================
+// ===================
 // フォームを閉じる関数
-// ========================
+// ===================
 const closeForm = () => {
     showForm.value = false
     editingItem.value = null
 }
 
-// ======================
+// =============
 // アイテム削除
-// =====================
+// =============
 const deleteItem = async (id) => {
 
     await deleteDoc(
@@ -420,9 +462,9 @@ const deleteItem = async (id) => {
     items.value = items.value.filter(item => item.id !== id)
 }
 
-// ======================
+// ============
 // ログアウト
-// =====================
+// ============
 const logout = async () => {
     if (unsubscribeItems) unsubscribeItems()
     if (unsubscribeGroup) unsubscribeGroup()
@@ -434,9 +476,9 @@ const logout = async () => {
     items.value = []
 }
 
-// ======================
+// ============================
 // アイテムの完了状態を切り替える
-// ======================
+// ============================
 const toggleItem = async (id, isDone) => {
     if (isDone === undefined) return
 
@@ -461,9 +503,9 @@ const copyShareLink = async () => {
     displayToast("🔗  共有リンクをコピーしました")
 }
 
-// ======================
+// ===================
 // グループ名を読み込む
-// ======================
+// ===================
 const loadGroupName = async () => {
     const groupDoc = await getDoc(
     doc(db, "groups", groupId.value)
@@ -474,25 +516,25 @@ const loadGroupName = async () => {
     }
 }
 
-// ======================
+// ==================
 // アイテムのカウント
-// ======================
+// ==================
 const remainingCount = computed(() => {
     return items.value.filter(item => !item.isDone).length
 })
 
-// ======================
+// ============
 // 管理者判定
-// ======================
+// ============
 const isAdmin = computed(() => {
     return currentGroup.value?.members?.some(
         m => m.uid === user.value.uid && m.role === "admin"
     )
 })
 
-// ======================
+// ==================
 // プロフィールへ遷移
-// ======================
+// ==================
 const goProfile = () => {
     router.push('/profile')
 }

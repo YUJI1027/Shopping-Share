@@ -1,38 +1,20 @@
 <template>
     <transition name="toast">
-        <div v-if="visible" class="toast">
+        <div 
+            v-if="visible" 
+            class="fixed bottom-7 left-1/2 -translate-x-1/2 z-[2000] px-5 py-3 bg-gray-900/90 text-white text-sm  font-medium shadow-xl backdrop-blur-sm animate-slide-up whitespace-nowrap"
+        >
             {{ message }}
         </div>
     </transition>
 </template>
 
 <script setup>
+// ========
+// Props
+// ========
 defineProps({
     message: String,
     visible: Boolean
 })
 </script>
-
-<style scoped>
-.toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size:  15px;
-    z-index: 2000;
-}
-
-.toast-enter-active,
-.toast-leave-active {
-    transition: all 0.3s ease, transform  0.3s ease;
-}
-
-.toast-enter-from,
-.toast-leave-to {
-    opacity: 0;
-    transform: translate(-50%, -100%);
-}
-</style>
