@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-b  from-green-50 to-white px-4 py-5 flex flex-col gap-4 items-center box-border">
+    <div class="min-h-screen bg-gradient-to-b from-green-50 to-white px-4 py-5 flex flex-col gap-4 items-center box-border">
         
         <div 
             v-if="isLoading" 
