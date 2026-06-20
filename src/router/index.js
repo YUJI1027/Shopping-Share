@@ -6,13 +6,15 @@ import { auth } from '../firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import Profile from '../components/Profile.vue'
 import GroupSettings from '../components/GroupSettings.vue'
+import PrivacyPolicy from '../views/PrivacyPolicy.vue'
 
 const routes = [
     { path: '/login', component: Login },
     { path: '/register', component: Register },
     { path: '/', component: Home, meta: { requiresAuth: true} },
     { path: '/profile', component: Profile },
-    { path: '/group/:id/setting', component: GroupSettings }
+    { path: '/group/:id/setting', component: GroupSettings },
+    { path: '/privacy', name: 'PrivacyPolicy', component: PrivacyPolicy }
 ]
 
 const router = createRouter({
