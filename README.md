@@ -4,153 +4,79 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vuedotjs)](https://vuejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite)](https://vitejs.dev/)
+[![Firebase](https://img.shields.io/badge/Firebase-12.x-FFCA28?logo=firebase)](https://firebase.google.com/)
+[![Vite](https://img.shields.io/badge/Vite-6.x-646CFF?logo=vite)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?logo=tailwindcss)](https://tailwindcss.com/)
 
 ## 📌 概要
 
-**Shopping Share** は、複数のVue.jsアプリケーションで構成される個人開発プロジェクトです。グループメンバーで買い物リストを共有したり、スケジュールを管理したりできます。
+**Shopping Share** は、Vue.js で構築した個人開発WEBアプリです。グループメンバーで買い物リストをリアルタイムに共有できます。Firebase Hosting にデプロイされており、PWA にも対応しています。
+
+🌐 **デモ**: [https://shopping-share-cd16b.web.app/](https://shopping-share-cd16b.web.app/)
 
 ## ✨ 主な機能
 
-### 🛍️ My Vue Shopping App
-- ✅ ショッピングアイテムの追加・削除・編集
-- 📊 残りのアイテム数の表示
-- 📱 スマホ対応のレスポンシブデザイン
-- 🎨 ブルー基調のモダンなUI
-
-### 📅 Vue Schedule App
-- 🗓️ イベント管理とカレンダー表示
-- 👥 グループメンバーとの連携
-- ⚙️ カスタマイズ可能な設定
-- 🎯 直感的なイベント追加・編集機能
+- 🛍️ ショッピングアイテムの追加・削除・編集
+- 👥 グループメンバーとの買い物リスト共有
+- 🔄 Firebase によるリアルタイムデータ同期
+- 📱 PWA対応（ホーム画面へのインストール可能）
+- 📲 スマホ対応のレスポンシブデザイン
 
 ## 🛠️ 技術スタック
 
-| 技術 | 説明 |
-|------|------|
-| **Vue.js 3** | フロントエンドフレームワーク |
-| **TypeScript** | 静的型付け言語 |
-| **Vite** | 高速ビルドツール |
-| **Vuex** | 状態管理 |
-| **Vue Router** | クライアント側ルーティング |
-| **CSS3** | レスポンシブデザイン対応 |
+| 技術 | バージョン | 説明 |
+|------|-----------|------|
+| **Vue.js** | 3.x | フロントエンドフレームワーク |
+| **Vue Router** | 5.x | クライアント側ルーティング |
+| **Firebase** | 12.x | バックエンド・リアルタイムDB・ホスティング |
+| **Tailwind CSS** | 4.x | ユーティリティファーストCSSフレームワーク |
+| **Vite** | 6.x | 高速ビルドツール |
+| **vite-plugin-pwa** | 1.x | PWA対応プラグイン |
+| **JavaScript** | ES Module | 実装言語 |
 
 ## 📁 プロジェクト構成
 
 ```
 Shopping-Share/
-├── my-vue-shopping-app/              # ショッピングアプリ
-│   ├── src/
-│   │   ├── components/               # UIコンポーネント
-│   │   ├── views/                    # ページコンポーネント
-│   │   ├── assets/                   # スタイルと静的ファイル
-│   │   ├── App.vue                   # ルートコンポーネント
-│   │   └── main.ts                   # アプリケーション設定
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── README.md
-│
-└── vue-schedule-app/                 # スケジュール管理アプリ
-    ├── src/
-    │   ├── components/               # UIコンポーネント（Header, Sidebar等）
-    │   ├── views/                    # ページコンポーネント（Home, Calendar等）
-    │   ├── layouts/                  # レイアウトコンポーネント
-    │   ├── store/                    # Vuexストア（状態管理）
-    │   ├── router/                   # ルーティング設定
-    │   ├── composables/              # Vue Composables（認証、グループ管理等）
-    │   ├── assets/                   # スタイルと静的ファイル
-    │   ├── utils/                    # ユーティリティ関数
-    │   ├── types/                    # TypeScript型定義
-    │   ├── App.vue                   # ルートコンポーネント
-    │   └── main.ts                   # アプリケーション設定
-    ├── package.json
-    ├── vite.config.ts
-    ├── tsconfig.json
-    └── README.md
+├── src/                              # メインアプリケーション
+├── my-vue-shopping-app/              # ショッピングアプリ（サブプロジェクト）
+├── vue-schedule-app/                 # スケジュール管理アプリ（サブプロジェクト）
+├── .firebase/                        # Firebase キャッシュ
+├── .github/workflows/                # GitHub Actions（CI/CD）
+├── .vscode/                          # VSCode設定
+├── firebase.json                     # Firebase Hosting設定
+├── .firebaserc                       # Firebaseプロジェクト設定
+├── index.html                        # エントリーHTML
+├── vite.config.js                    # Vite設定
+├── tailwind.config.js                # Tailwind CSS設定
+├── postcss.config.js                 # PostCSS設定
+├── jsconfig.json                     # JavaScript設定
+└── package.json                      # 依存関係
 ```
 
 ## 🚀 セットアップ
 
 ### 前提条件
-- Node.js 16.x 以上
-- npm または yarn
+
+- Node.js 18.x 以上
+- npm
 
 ### インストール手順
 
-#### My Vue Shopping App
-
 ```bash
 # 1. リポジトリをクローン
 git clone https://github.com/YUJI1027/Shopping-Share.git
 cd Shopping-Share
 
-# 2. ディレクトリに移動
-cd my-vue-shopping-app
-
-# 3. 依存関係をインストール
+# 2. 依存関係をインストール
 npm install
 
-# 4. 開発サーバーを起動
+# 3. 開発サーバーを起動
 npm run dev
 
-# 5. ブラウザで開く
+# 4. ブラウザで開く
 # http://localhost:5173 (または表示されたURL)
 ```
-
-#### Vue Schedule App
-
-```bash
-# 1. リポジトリをクローン
-git clone https://github.com/YUJI1027/Shopping-Share.git
-cd Shopping-Share
-
-# 2. ディレクトリに移動
-cd vue-schedule-app
-
-# 3. 依存関係をインストール
-npm install
-
-# 4. 開発サーバーを起動
-npm run dev
-
-# 5. ブラウザで開く
-# http://localhost:5173 (または表示されたURL)
-```
-
-## 📚 使用方法
-
-### My Vue Shopping App
-1. アプリケーションを起動する
-2. 入力フィールドにアイテムを入力
-3. **Add** ボタンをクリックして買い物リストに追加
-4. アイテムの編集・削除が可能
-5. 購入済みアイテムは自動的にカウント表示
-
-### Vue Schedule App
-1. アプリケーションを起動する
-2. ホーム画面でグループを選択
-3. カレンダービューでイベントを確認
-4. **Add Event** ボタンで新規イベントを作成
-5. イベント詳細の編集・削除が可能
-
-## 🎨 デザイン特徴
-
-- **カラースキーム**: ブルー基調のモダンなデザイン
-- **レスポンシブ対応**: スマートフォン・タブレット・デスクトップ対応
-- **ユーザーフレンドリー**: 直感的なUI/UXデザイン
-- **アクセシビリティ**: 視認性の高いフォントサイズと色合い
-
-## 🏗️ ビルド
-
-### 本番環境用ビルド
-
-```bash
-# 各アプリケーションのディレクトリで実行
-npm run build
-```
-
-ビルド後の成果物は `dist/` ディレクトリに出力されます。
 
 ## 📝 スクリプト
 
@@ -165,27 +91,36 @@ npm run build
 npm run preview
 ```
 
-## 🔧 カスタマイズ
+## 🏗️ デプロイ
 
-### スタイルの変更
-各アプリケーションの `src/assets/styles/` ディレクトリ内のCSSファイルを編集してください。
+Firebase Hosting を使用してデプロイしています。
 
-- `variables.css`: カラーパレットの定義
-- `base.css`: 基本スタイル
-- `responsive.css`: レスポンシブブレークポイント
+```bash
+# ビルド
+npm run build
 
-### 状態管理（Vue Schedule App）
-`src/store/index.ts` でVuexストアを設定しています。必要に応じてアクションやミューテーションを追加できます。
+# Firebase にデプロイ
+firebase deploy
+```
+
+ビルド後の成果物は `dist/` ディレクトリに出力され、Firebase Hosting に公開されます。
 
 ## 📦 主要な依存パッケージ
 
-- `vue@3.x` - UIフレームワーク
-- `vue-router@4.x` - ルーティング
-- `vuex@4.x` - 状態管理（vue-schedule-app）
-- `typescript@5.x` - 静的型付け
-- `vite@5.x` - ビルドツール
-
-詳細は各アプリケーションの `package.json` を参照してください。
+```json
+{
+  "dependencies": {
+    "firebase": "^12.11.0",
+    "vite-plugin-pwa": "^1.2.0",
+    "vue": "^3.5.13",
+    "vue-router": "^5.0.6"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.2.4",
+    "vite": "^6.2.4"
+  }
+}
+```
 
 ## 🤝 貢献
 
@@ -203,4 +138,4 @@ npm run preview
 
 ---
 
-**最終更新**: 2026年6月16日
+**最終更新**: 2026年6月26日
