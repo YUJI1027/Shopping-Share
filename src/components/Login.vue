@@ -12,21 +12,41 @@
                 <form @submit.prevent="login" class="flex flex-col gap-3">
                     <label class="flex flex-col gap-1.5">
                         <span class="text-xs font-medium text-gray-500">メールアドレス</span>
-                        <input v-model="email" type="email" required autocomplete="email" class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" />
+                        <input 
+                            v-model="email" 
+                            type="email" 
+                            required autocomplete="email" 
+                            class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" 
+                        />
                     </label>
 
                     <label class="flex flex-col gap-1.5">
                         <span class="text-xs font-medium text-gray-500">パスワード</span>
-                        <input v-model="password" type="password" required autocomplete="current-password" class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" />
+                        <input 
+                            v-model="password" 
+                            type="password" 
+                            required autocomplete="current-password" 
+                            class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" 
+                        />
                     </label>
 
-                    <button type="submit" :disabled="isSubmitting" class="mt-1 w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-md shadow-green-200  transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                    <button 
+                        type="submit" 
+                        :disabled="isSubmitting" 
+                        class="mt-1 w-full py-3 rounded-xl text-base font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-md shadow-green-200  transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
                         {{ isSubmitting ? 'ログイン中…' : 'ログイン' }}
                     </button>
                 </form>
 
                 <div class="flex justify-center pt-1">
-                    <button class="text-sm font-semibold text-green-600 hover:underline cursor-pointer bg-transparent border-none" @click="goRegister" aria-label="新規登録へ">新規登録はこちら</button>
+                    <button 
+                        class="text-sm font-semibold text-green-600 hover:underline cursor-pointer bg-transparent border-none" 
+                        @click="goRegister" 
+                        aria-label="新規登録へ"
+                    >
+                        新規登録はこちら
+                    </button>
                 </div>
             </div>
         </div>
@@ -38,26 +58,28 @@
 // コンポーネントのインポート
 // ======================
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../firebase'
 
-// ======================
+// ========
 // state
-// ======================
+// ========
 const email = ref('')
 const password = ref('')
 const router = useRouter()
+const route = useRoute()
 const isSubmitting = ref(false)
 
-// ======================
+// ===========
 // login処理
-// ======================
+// ===========
 const login = async () => {
     isSubmitting.value = true
     try {
         await signInWithEmailAndPassword(auth, email.value, password.value)
-        router.push('/')
+        const redirect = route.query.redirect || '/home'
+        router.push(redirect)
     } catch (error) {
         alert('ログインに失敗しました: ' + (error.message || error))
     } finally {
@@ -68,7 +90,7 @@ const login = async () => {
 // ======================
 // 新規登録ページへ遷移
 // ======================
-const goRegister = () => {
-  router.push('/register') 
+const goRegister = () => { 
+    router.push('/register') 
 }
 </script>

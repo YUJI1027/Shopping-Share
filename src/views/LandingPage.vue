@@ -3,7 +3,7 @@
 
         <!-- ナビゲーション -->
         <nav class="w-full px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
-            <span class="text-2xl font-black text-green-700 tracking-tight">🛒 Shopping Share</span>
+            <span class="text-lg font-black text-green-700 tracking-tight">🛒 Shopping Share</span>
             <div class="flex gap-2">
                 <button 
                     @click="goLogin"
@@ -26,7 +26,7 @@
                 家族・友人とお買い物をシェアしよう！
             </div>
             <h1 class="text-4xl font-black text-green-900 leading-tight">
-                買い物リストを<br/>みんなで共有する、<br />
+                買い物リストを<br/>みんなで共有する<br />
                 <span class="text-transparent bg-clip-text  bg-gradient-to-r from-green-500 to-emerald-600">かんたんアプリ</span>
             </h1>
             <p class="text-gray-500 text-base leading-relaxed">
@@ -89,7 +89,7 @@
         </section>
 
         <!-- お問い合わせセクション -->
-        <section class="px-6 py-12 max-w-12 mx-auto">
+        <section class="px-6 py-12 max-w-2xl mx-auto">
             <h2 class="text-2xl font-black text-green-900 text-center mb-2">お問い合わせ</h2>
             <p class="text-sm text-gray-500 text-center mb-8">ご意見・ご用意</p>
             <div class="bg-white rounded-2xl px-6 py-6 shadow-sm border border-gray-100 flex flex-col gap-4">
@@ -159,7 +159,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {  sendContactEmail } from '../services/emailService'
+import { sendContactEmail } from '../services/emailService'
 
 // ==================
 // 
@@ -184,8 +184,8 @@ const features = [
     },
     {
         icon: '🔔',
-        title: 'メール通知',
-        description: '新しいメンバーが参加したときにメールで通知。設定画面でON/OFFを切り替えられます。',
+        title: 'アプリ内通知',
+        description: '新しいメンバーが参加するとグループ内にお知らせが表示されます。大事な情報のを見逃しません。',
     },
 ]
 

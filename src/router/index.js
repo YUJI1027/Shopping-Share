@@ -34,7 +34,7 @@ const routes = [
                 next()
             }
         }
-    }
+    },
     { path: '/login', component: Login },
     { path: '/register', component: Register },
     { path: '/home', component: Home, meta: { requiresAuth: true} },
@@ -54,7 +54,8 @@ router.beforeEach((to, from, next) => {
             currentUser = user
             isAuthReady = true
             if (to.meta.requiresAuth && !user) {
-                next('/login')
+                // ログイン後に戻れるよう、元のURLをredirectパラメータとして渡す
+                next({ path: '/login', query: { redirect: to.fullPath } })
             } else {
                 next()
             }
@@ -62,7 +63,7 @@ router.beforeEach((to, from, next) => {
         })
     } else {
         if (to.meta.requiresAuth && !currentUser) {
-            next('/login')
+            next({ path: '/login', query: { redirect: to.fullPath } })
         } else {
             next()
         }

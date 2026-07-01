@@ -33,5 +33,5 @@
 // =================================
 // アプリのバージョンを環境変数から取得
 // =================================
-import { version } from '../../package.json'
+const version = __APP_VERSION__
 </script>

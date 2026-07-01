@@ -18,7 +18,7 @@
                 inputmode="text"
                 v-model="item"
                 placeholder="商品名"
-                class="w-full px-4 py-3 rounded-xl border  border-gray-200 text-sm bg-gray-50 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                class="w-full px-4 py-3 rounded-xl border  border-gray-200 text-base bg-gray-50 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
             />
 
             <input 
@@ -26,13 +26,13 @@
                 type="number"
                 min="1"
                 placeholder="数量"
-                class="mt-3 w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                class="mt-3 w-full px-4 py-3 rounded-xl border border-gray-200 text-base bg-gray-50 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
             />
 
             <textarea 
                 v-model="memo"
                 placeholder="メモ"
-                class="mt-3 w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition min-h-[88px] resize-y"
+                class="mt-3 w-full px-4 py-3 rounded-xl border border-gray-200 text-base bg-gray-50 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition min-h-[88px] resize-y"
             >
             </textarea>
 

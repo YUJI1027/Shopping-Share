@@ -43,7 +43,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  // バージョン管理
   define: {
-    _APP_VERSION__:  JSON.stringify(pkg.version),
+    __APP_VERSION__:  JSON.stringify(pkg.version), 
   },
 })

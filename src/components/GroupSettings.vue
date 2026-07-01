@@ -155,7 +155,7 @@ const leaveGroup = async ()  => {
     )
 
     alert("グループを退出しました。")
-    router.push('/')
+    router.push('/home')
 }
 
 // ===============
