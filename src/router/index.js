@@ -7,11 +7,37 @@ import { onAuthStateChanged } from 'firebase/auth'
 import Profile from '../components/Profile.vue'
 import GroupSettings from '../components/GroupSettings.vue'
 import PrivacyPolicy from '../views/PrivacyPolicy.vue'
+import LandingPage from '../views/LandingPage.vue'
+
+
+let currentUser = null
+let isAuthReady = false
+// let isAuthChecked = false
+
+// ====================
+// 認証状態を事前に取得
+// ====================
+onAuthStateChanged(auth, (user) => {
+    currentUser = user
+    isAuthReady = true
+})
 
 const routes = [
+    {
+        path: '/',
+        component: LandingPage,
+        beforeEnter: (to, from, next) => {
+            // ログイン済みなら /home へリダイレクト
+            if (currentUser) {
+                next('/home')
+            } else {
+                next()
+            }
+        }
+    },
     { path: '/login', component: Login },
     { path: '/register', component: Register },
-    { path: '/', component: Home, meta: { requiresAuth: true} },
+    { path: '/home', component: Home, meta: { requiresAuth: true} },
     { path: '/profile', component: Profile },
     { path: '/group/:id/setting', component: GroupSettings },
     { path: '/privacy', name: 'PrivacyPolicy', component: PrivacyPolicy }
@@ -22,22 +48,14 @@ const router = createRouter({
     routes
 })
 
-let isAuthChecked = false
-let currentUser = null
-let isAuthReady = false
-
-onAuthStateChanged(auth, (user) => {
-    currentUser = user
-    isAuthReady = true
-})
-
 router.beforeEach((to, from, next) => {
     if (!isAuthReady) {
         const unwatch = onAuthStateChanged(auth, (user) => {
             currentUser = user
-            isAuthChecked = true
+            isAuthReady = true
             if (to.meta.requiresAuth && !user) {
-                next('/login')
+                // ログイン後に戻れるよう、元のURLをredirectパラメータとして渡す
+                next({ path: '/login', query: { redirect: to.fullPath } })
             } else {
                 next()
             }
@@ -45,7 +63,7 @@ router.beforeEach((to, from, next) => {
         })
     } else {
         if (to.meta.requiresAuth && !currentUser) {
-            next('/login')
+            next({ path: '/login', query: { redirect: to.fullPath } })
         } else {
             next()
         }

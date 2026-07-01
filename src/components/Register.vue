@@ -6,33 +6,87 @@
                 <h1 class="text-2xl font-black tracking-tight text-green-800">Shopping Share</h1>
                 <p class="text-sm text-gray-500 leading-relaxed">グループで共有する買い物メモ。<br>すぐ始められます。</p>
             </div>
-            <div class="bg-white rounded-2xl p-6 shadow-lg shadow-green-100 border border-gray-100 flex flex-col gap-4" role="region" aria-label="新規登録">
+
+            <!-- 通情登録フォーム -->
+            <div v-if="!verificationSent" class="bg-white rounded-2xl p-6 shadow-lg shadow-green-100 border border-gray-100 flex flex-col gap-4" role="region" aria-label="新規登録">
                 <h2 class="text-lg font-bold text-gray-900 text-center">新規登録</h2>
                 
                 <form @submit.prevent="register" class="flex flex-col gap-3">
                     <label class="flex flex-col gap-1.5">
                         <span class="text-xs font-medium text-gray-500">ユーザー名</span>
-                        <input v-model="name" type="text" required class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" />
+                        <input 
+                            v-model="name" 
+                            type="text" 
+                            required autocomplete="name"
+                            class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" 
+                        />
                     </label>
 
                     <label class="flex flex-col gap-1.5">
                         <span class="text-xs font-medium text-gray-500">メールアドレス</span>
-                        <input v-model="email" type="email" required autocomplete="email" class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" />
+                        <input 
+                            v-model="email" 
+                            type="email" 
+                            required autocomplete="email" 
+                            class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" 
+                        />
                     </label>
 
                     <label class="flex flex-col gap-1.5">
                         <span class="text-xs font-medium text-gray-500">パスワード</span>
-                        <input v-model="password" type="password" minlength="6" required autocomplete="new-password" class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" />
+                        <input 
+                            v-model="password" 
+                            type="password" 
+                            minlength="6" 
+                            required autocomplete="new-password" 
+                            class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition" 
+                        />
                     </label>
 
-                    <button type="submit" :disabled="isSubmitting" class="mt-1 w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-green-200 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                    <button 
+                        type="submit" 
+                        :disabled="isSubmitting" 
+                        class="mt-1 w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-green-200 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
                         {{ isSubmitting ? '登録中…' : '登録' }}
                     </button>
                 </form>
 
                 <div class="flex justify-center pt-1">
-                    <button class="text-sm font-semibold text-green-600 hover:underline cursor-pointer bg-transparent border-none" @click="goLogin" aria-label="ログインへ">すでにアカウントをお持ちの方はこちら</button>
+                    <button 
+                        class="text-sm font-semibold text-green-600 hover:underline cursor-pointer bg-transparent border-none" 
+                        @click="goLogin" 
+                        aria-label="ログインへ"
+                    >
+                        すでにアカウントをお持ちの方はこちら
+                    </button>
                 </div>
+            </div>
+
+            <!-- 確認メール送信後の画面 -->
+            <div v-else class="bg-white rounded-2xl p-6 shadow-lg shadow-green-100 border border-gray-100 flex flex-col gap-4 text-center">
+                <span class="text-4xl">📧</span>
+                <h2 class="text-lg font-bold text-gray-900">確認メールを送信しました</h2>
+                <p class="text-sm text-gray-500 leading-relaxed">
+                    <span class="font-semibold text-green-700">{{ email }}</span>に確認メールを送りました。<br>
+                    メール内のリンクをクリックして登録を完了してください。
+                </p>
+                <p class="text-xs text-gray-400">
+                    メールが届かない場合は迷惑メールフォルダをご確認ください、
+                </p>
+                <button 
+                    @click="goLogin"
+                    class="w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-green-200 transition cursor-pointer"
+                >
+                    ログイン画面へ
+                </button>
+                <button 
+                    @click="resendVerification"
+                    :disabled="isResending"
+                    class="text-sm text-green-600 hover:underline cursor-pointer bg-transparent border-none disabled:opacity-50"
+                >
+                    {{ isResending ? '送信中...' : '確認メールを再送する' }}
+                </button>
             </div>
         </div>
     </div>
@@ -41,9 +95,9 @@
 <script setup>
 // コンポーネントのインポート
 import { ref } from 'vue'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth'
 import { auth, db } from '../firebase'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { setDoc, doc } from 'firebase/firestore'
 
 // =========
@@ -53,7 +107,10 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 const router = useRouter()
+const route = useRoute()
 const isSubmitting = ref(false)
+const verificationSent = ref(false) // 確認メール送信済みフラグ
+const isResending = ref(false) // 再送信中フラグ
 
 // ============
 // 新規登録処理
@@ -70,15 +127,24 @@ const register = async ()  => {
         await updateProfile(userCred.user, { displayName: name.value })
 
         await setDoc(doc(db, "users", userCred.user.uid), {
-            name: name.value,
-            groups: []
+            name: name.value, 
+            groups: [], 
+            email: email.value 
         })
 
         await setDoc(doc(db, "publicUsers", userCred.user.uid), {
             name: name.value
         })
 
-        router.push('/')
+        // 確認メールを送信
+        await sendEmailVerification(userCred.user)
+
+        // 登録直後に一旦サインアウト（自動ログインを防ぐ）
+        await signOut(auth)
+
+        // 確認メール送信済み画面に切り替え
+        verificationSent.value = true
+
     } catch (error) {
         let errorMessage = "登録に失敗しました。"
 
@@ -94,6 +160,24 @@ const register = async ()  => {
         alert(errorMessage)
     } finally {
         isSubmitting.value = false
+    }
+}
+
+// ====================
+// 確認メールを再送信
+// ====================
+const resendVerification = async () => {
+    isResending.value = true
+    try {
+        const user = auth.currentUser
+        if (user) {
+            await sendEmailVerification(user)
+            alert('確認メールを再送しました。')
+        }
+    } catch (error) {
+        alert('再送に失敗しました。しばらくしてから再度お試しください。')
+    } finally {
+        isResending.value = false
     }
 }
 

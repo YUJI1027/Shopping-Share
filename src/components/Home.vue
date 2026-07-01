@@ -5,7 +5,7 @@
             v-if="isLoading" 
             class="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-content"
         >
-            <div class="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-500  animate-spin-custom"></div>
+            <div class="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-500 animate-spin-custom"></div>
         </div>
 
         <div class="w-full max-w-2xl flex flex-col gap-4">
@@ -13,20 +13,25 @@
             <Header />
             
             <div class="w-full bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center justify-between">
-                <button class="text-base font-bold text-green-800 hover:text-green-500  transition cursor-pointer bg-transparent border-none"
-                        @click="goProfile">
+                <button 
+                    class="text-base font-bold text-green-800 hover:text-green-500  transition cursor-pointer bg-transparent border-none"
+                    @click="goProfile"
+                >
                     {{ userName }}
                 </button>
-                <button @click="logout" 
-                        class="text-sm text-red-500 hover:underline cursor-pointer bg-transparent border-none">
+                <button 
+                    @click="logout" 
+                    class="text-sm text-red-500 hover:underline cursor-pointer bg-transparent border-none"
+                >
                     ログアウト
                 </button>
             </div>
 
             <div class="w-full bg-white rounded-2xl  px-4  py-4 shadow-sm border border-gray-100 flex flex-col gap-3">
                 <div class="flex items-center justify-between">
-                    <button @click="goGroupSetting"
-                            class="text-lg font-bold text-green-900 hover:text-green-500 transition cursor-pointer bg-transparent border-none"
+                    <button 
+                        @click="goGroupSetting"
+                        class="text-lg font-bold text-green-900 hover:text-green-500 transition cursor-pointer bg-transparent border-none"
                     >
                         {{ groupName || "未設定" }}   
                     </button>
@@ -88,6 +93,21 @@
                 <span class="text-sm  text-gray-500">件</span>
             </div>
 
+            <!-- 通知履歴 -->
+            <div 
+                v-if="notifications.length > 0"
+                class="w-full bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex flex-col gap-2"
+            >
+                <span class="text-xs font-bold text-gray-500">🔔 最近のお知らせ</span>
+                <div 
+                    v-for="n in notifications"
+                    :key="n.id"
+                    class="text-sm text-gray-600 py-1.5 border-b border-gray-50 last:border-none"
+                >
+                    {{ n.text }}
+                </div>
+            </div>
+
             <ShoppingList 
                 :items="items"
                 @delete-item="deleteItem"
@@ -99,7 +119,7 @@
 
         <button 
             @click="showForm=true" 
-            class="fixed right-5 bottom-6 z-[1000] flex items-center gap-2 h-14 px-4 rounded-full bg-gradient-to-r  from-green-500 to-emerald-600 text-white font-bold shadow-green-300 hover:opacity-90 transition cursor-pointer md:rounded-xl md:h-12 md:px-5" 
+            class="fixed right-5 bottom-6 z-[1000] flex items-center gap-2 h-14 px-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold shadow-green-300 hover:opacity-90 transition cursor-pointer md:rounded-xl md:h-12 md:px-5" 
             aria-label="アイテムを追加"
         >
             <span class="text-xl leading-none">＋</span>
@@ -126,10 +146,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref, watch, onMounted, computed } from 'vue'
 import  {
     onAuthStateChanged,
-    reload,
     signOut,
-    updateEmail,
-    updatePassword,
 } from "firebase/auth"
 import {
     collection,
@@ -142,7 +159,10 @@ import {
     getDoc,
     arrayUnion,
     serverTimestamp,
-    arrayRemove
+    arrayRemove,
+    query,
+    orderBy,
+    limit
 } from "firebase/firestore"
 
 // コンポーネントのインポート
@@ -175,17 +195,21 @@ const showToast = ref(false) // トーストの表示状態を管理するため
 
 const isLoading = ref(false) // ローディング状態を管理するためのref
 
+const notifications = ref([]) // 通知履歴を管理するためのref
+
 // ==============
 // snapshot管理
 // ==============
 let unsubscribeItems = null
 let unsubscribeGroup = null
+let unsubscribeNotifications = null
 
 const reloadGroup = (gid) => {
     if (!gid || !user.value) return
 
     if (unsubscribeItems) unsubscribeItems()
     if (unsubscribeGroup) unsubscribeGroup()
+    if (unsubscribeNotifications) unsubscribeNotifications()
 
     unsubscribeItems = onSnapshot(
         collection(db, "groups", gid, "items"),
@@ -215,6 +239,21 @@ const reloadGroup = (gid) => {
             displayToast("このグループにアクセスする権限がありません。")
         }
     )
+
+    // 通知履歴のリアルタイム取得（最新５件）
+    unsubscribeNotifications = onSnapshot(
+        query(
+            collection(db, "groups", gid, "notifications"),
+            orderBy("createAt", "desc"),
+            limit(5)
+        ),
+        (snapshot) => {
+            notifications.value = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+        }
+    )
 }
 
 // ==========
@@ -235,7 +274,7 @@ onMounted(() => {
 
         if (!groupId.value) {
             const newId = crypto.randomUUID()
-            router.replace({ path: '/', query: { group: newId } })
+            router.replace({ path: '/home', query: { group: newId } })
             return
         }
 
@@ -264,16 +303,27 @@ const initUser = async (firebase) => {
     const userRef = doc(db, "users", firebase.uid)
     const userDoc = await getDoc(userRef)
 
+    // usersが存在しない場合は初期化（グループ情報等の非公開データ）
     if (!userDoc.exists()) {
         await setDoc(userRef, {
-            name: "名前なし",
             email: firebase.email,
             groups: []
         })
     }
 
-    const updateDoc = await getDoc(userRef)
-    userName.value = updateDoc.data().name
+    // publicUsersが存在しない場合は初期化（名前の公開データ）
+    const publicUsersRef = doc(db,  "publicUsers",  firebase.uid)
+    const publicUsersDoc = await getDoc(publicUsersRef)
+
+    if (!publicUsersDoc.exists()) {
+        await setDoc(publicUsersRef, {
+            name: "名前なし"
+        })
+    }
+    
+    // 名前はpublicUsersから取得
+    const latestPublicUser = await getDoc(publicUsersRef)
+    userName.value = latestPublicUser.data().name
 }
 
 // =============
@@ -323,7 +373,7 @@ const createNewGroup = async () => {
     await loadUserGroups()
 
     // 新しいグループに切り替える
-    router.replace({ path: '/', query: { group: newGroupId } })
+    router.replace({ path: '/home', query: { group: newGroupId } })
 }
 
 // ================
@@ -334,7 +384,7 @@ const switchGroup = async (gid) => {
 
     isLoading.value = true
 
-    router.push({ path: '/', query: { group: gid } })
+    router.push({ path: '/home', query: { group: gid } })
     displayToast("🔄 グループを切り替えました")
 }
 
@@ -355,13 +405,22 @@ const ensureJoinedGroup = async (gid) => {
     try {
         const newMembers = [...members, user.value.uid]
 
-        await updateDoc (ref, 
-        { members: newMembers })
+        await updateDoc (ref, { members: newMembers })
 
         await updateDoc(doc(db, "users", user.value.uid),
-        { groups: arrayUnion(gid) })
+            { groups: arrayUnion(gid) })
         
-        console.log("グループに参加しました:", gid)
+        // 通知をFirestoreに保存
+        await addDoc(
+            collection(db, "groups", gid, "notifications"),
+            {
+                text: `${userName.value} さんがグループに参加しました。`,
+                createAt: serverTimestamp()
+            }
+        )
+
+        // トースト表示
+        displayToast("🎉 グループに参加しました！")
 
     } catch (error) {
         throw error
@@ -468,6 +527,7 @@ const deleteItem = async (id) => {
 const logout = async () => {
     if (unsubscribeItems) unsubscribeItems()
     if (unsubscribeGroup) unsubscribeGroup()
+    if (unsubscribeNotifications) unsubscribeNotifications()
 
     await signOut(auth)
     router.push('/login')
@@ -483,13 +543,7 @@ const toggleItem = async (id, isDone) => {
     if (isDone === undefined) return
 
     await updateDoc(
-    doc(
-        db,
-        "groups",
-        groupId.value,
-        "items",
-        id
-    ),
+    doc(db, "groups", groupId.value, "items", id),
     {
         isDone: isDone,
         doneBy: isDone ? userName.value : "" 
@@ -523,9 +577,9 @@ const remainingCount = computed(() => {
     return items.value.filter(item => !item.isDone).length
 })
 
-// ============
-// 管理者判定
-// ============
+// ===========================
+// 管理者判定 計画中のため非機能
+// ===========================
 const isAdmin = computed(() => {
     return currentGroup.value?.members?.some(
         m => m.uid === user.value.uid && m.role === "admin"
