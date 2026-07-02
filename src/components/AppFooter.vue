@@ -16,14 +16,7 @@
                 >
                     プライバシーポリシー
                 </RouterLink>
-                <a 
-                    href="https://github.com/YUJI1027/Shopping-Share/releases"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="hover:text-green-600 transition-colors"
-                >
-                    更新履歴
-                </a>
+                <span>© 2026 Shopping Share</span>
             </div>
         </div>
     </footer>
