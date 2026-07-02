@@ -99,7 +99,7 @@
                         v-model="form.name"
                         type="text"
                         placeholder="お買い物　太郎"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
                     />
                 </div>
                 <div class="flex flex-col gap-1.5">
@@ -108,7 +108,7 @@
                         v-model="form.email"
                         type="email"
                         placeholder="example@email.com"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
                     />
                 </div>
                 <div class="flex flex-col gap-1.5">
@@ -117,7 +117,7 @@
                         v-model="form.message"
                         placeholder="お問い合わせ内容を入力してください"
                         rows="4"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition resize-none"
+                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition resize-none"
                     />
                 </div>
 
@@ -139,20 +139,6 @@
                 </p>
             </div>
         </section>
-
-        <!-- フッター -->
-        <footer class="px-6 py-8 border-t border-gray-100 text-center flex flex-col gap-2">
-            <span class="text-sm font-black text-green-700">🛒 Shopping Share</span>
-            <div class="flex justify-center gap-4">
-                <router-link 
-                    to="/privacy"
-                    class="text-xs text-gray-400 hover:text-green-600 transition"
-                >
-                    プライバシーポリシー
-                </router-link>
-            </div>
-            <p class="text-xs text-gray-300">© 2026 Shopping Share</p>
-        </footer>
     </div>
 </template>
 
@@ -160,6 +146,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { sendContactEmail } from '../services/emailService'
+
+import AppFooter from '../components/AppFooter.vue'
 
 // ==================
 // 
@@ -203,7 +191,7 @@ const notices = [
         date: '2026.07.01',
         badge: 'アップデート',
         badgeClass: 'bg-emerald-100 text-emerald-700',
-        text: 'メール通知機能を追加しました',
+        text: 'v1.1.0：LandingPage追加、メール認証、アプリ内通知履歴を追加しました',
     }
 ]
 
