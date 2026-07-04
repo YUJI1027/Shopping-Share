@@ -2,18 +2,18 @@
     <div class="min-h-screen bg-gradient-to-b from-green-50 to-white">
 
         <!-- ナビゲーション -->
-        <nav class="w-full px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
-            <span class="text-lg font-black text-green-700 tracking-tight">🛒 Shopping Share</span>
-            <div class="flex gap-2">
+        <nav class="w-full px-4 sm:px-6 py-4 flex items-center justify-between gap-2 max-w-4xl mx-auto">
+            <span class="text-lg font-black text-green-700 tracking-tight  whitespace-nowrap">🛒 Shopping Share</span>
+            <div class="flex gap-2 flex-shrink-0">
                 <button 
                     @click="goLogin"
-                    class="px-4 py-2 rounded-xl text-sm font-semibold text-green-700 border border-green-200 hover:bg-green-50 transition cursor-pointer bg-transparent"
+                    class="px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold text-green-700 border border-green-200 hover:bg-green-50 transition cursor-pointer bg-transparent"
                 >
                     ログイン
                 </button>
                 <button 
                     @click="goRegister"
-                    class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-md shadow-green-200 transition cursor-pointer"
+                    class="px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-md shadow-green-200 transition cursor-pointer"
                 >
                     新規登録
                 </button>
