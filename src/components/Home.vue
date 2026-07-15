@@ -3,14 +3,17 @@
         
         <div 
             v-if="isLoading" 
-            class="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-content"
+            class="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-center"
         >
-            <div class="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-500 animate-spin-custom"></div>
+            <div class="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-500 animate-spin"></div>
         </div>
 
         <div class="w-full max-w-2xl flex flex-col gap-4">
             
-            <Header />
+            <Header 
+                :hasUnread="hasUnread"
+                @open-notifications="openNotificationPanel" 
+            />
             
             <div class="w-full bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center justify-between">
                 <button 
@@ -95,16 +98,34 @@
 
             <!-- 通知履歴 -->
             <div 
-                v-if="notifications.length > 0"
-                class="w-full bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex flex-col gap-2"
+                v-if="showNotificationPanel"
+                class="fixed inset-0 z-[9999]  bg-black/30 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+                @click.self="closeNotificationPanel"
             >
-                <span class="text-xs font-bold text-gray-500">🔔 最近のお知らせ</span>
-                <div 
-                    v-for="n in notifications"
-                    :key="n.id"
-                    class="text-sm text-gray-600 py-1.5 border-b border-gray-50 last:border-none"
-                >
-                    {{ n.text }}
+                <div class="w-full sm:max-w-md bg-white rounded-2xl p-5 shadow-2xl max-h-[70vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-base font-bold text-gray-900">🔔 お知らせ</span>
+                        <button 
+                            @click="closeNotificationPanel" 
+                            class="text-gray-400 hover:text-gray-600 cursor-pointer bg-transparent border-none text-xl leading-none"
+                        >
+                            ×
+                        </button>
+                    </div>
+
+                    <div  
+                        v-for="n in notifications"
+                        :key="n.id"
+                        class="text-sm text-gray-600 py-2.5 border-b border-gray-50 last:border-none"
+                    >
+                        {{ n.text }}
+                    </div>
+                    <div 
+                    v-if="notifications.length === 0"
+                    class="text-sm text-gray-400 text-center py-6"
+                    >
+                        お知らせはありません
+                    </div>
                 </div>
             </div>
 
@@ -197,6 +218,9 @@ const isLoading = ref(false) // ローディング状態を管理するための
 
 const notifications = ref([]) // 通知履歴を管理するためのref
 
+const showNotificationPanel  = ref(false) // 通知パネルの表示状態を管理するためのref
+const lastReadAt = ref(null) // 最後に通知を読んだ時間を管理するためのref
+
 // ==============
 // snapshot管理
 // ==============
@@ -210,6 +234,14 @@ const reloadGroup = (gid) => {
     if (unsubscribeItems) unsubscribeItems()
     if (unsubscribeGroup) unsubscribeGroup()
     if (unsubscribeNotifications) unsubscribeNotifications()
+
+    // このグループの既読時刻を取得
+    getDoc(doc(db, "users", user.value.uid)).then(userDoc => {
+        if (userDoc.exists()) {
+            const readMap = userDoc.data().lastReadNotificationAt || {}
+            lastReadAt.value = readMap[gid] || 0
+        }
+    })
 
     unsubscribeItems = onSnapshot(
         collection(db, "groups", gid, "items"),
@@ -240,18 +272,17 @@ const reloadGroup = (gid) => {
         }
     )
 
-    // 通知履歴のリアルタイム取得（最新５件）
+    // 通知履歴のリアルタイム取得（最新20件、自分自身の追加分は除外）
     unsubscribeNotifications = onSnapshot(
         query(
             collection(db, "groups", gid, "notifications"),
             orderBy("createAt", "desc"),
-            limit(5)
+            limit(20)
         ),
         (snapshot) => {
-            notifications.value = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }))
+            notifications.value = snapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(n => n.addedByUid !== user.value.uid) // 自分が追加した通知は除外
         }
     )
 }
@@ -357,11 +388,11 @@ const createNewGroup = async () => {
 
     // groupsに新しいグループを作成
     await setDoc(doc(db, "groups", newGroupId), {
-    name: newGroupName.value,
-    members: [user.value.uid],
-    ownerId: user.value.uid,
-    isPublic: true,
-    createdAt: serverTimestamp()
+        name: newGroupName.value,
+        members: [user.value.uid],
+        ownerId: user.value.uid,
+        isPublic: true,
+        createdAt: serverTimestamp()
     })
 
     // ユーザー更新
@@ -435,52 +466,69 @@ const displayToast = (message) => {
     showToast.value = true
 
     setTimeout(() => {
-    showToast.value = false
+        showToast.value = false
     },  3000)
 }
 
 // ==================
 // アイテム追加/更新
 // ==================
-const AddItem = async (itemName, quantity, memo) => {
+const AddItem = async (itemName, quantity, memo, category) => {
     if (!itemName) return
     
     if (editingItem.value?.id) {
     await updateDoc(
         doc(
-        db,
-        "groups",
-        groupId.value,
-        "items",
-        editingItem.value.id
+            db,
+            "groups",
+            groupId.value,
+            "items",
+            editingItem.value.id
         ),
         {
-        name: itemName,
-        quantity:  quantity ||  1,
-        memo: memo || '',
-        updatedAt: serverTimestamp()
+            name: itemName,
+            quantity:  quantity ||  1,
+            memo: memo || '',
+            category: category || '',
+            updatedAt: serverTimestamp()
         }
     )
-    displayToast("🔄  更新しました")
-    editingItem.value =null
+        displayToast("🔄  更新しました")
+        editingItem.value =null
     } else {
+        await addDoc(
+            collection(
+            db,
+            "groups",
+            groupId.value,
+            "items"
+        ),
+        {
+            name: itemName,
+            quantity: quantity || 1,
+            memo: memo || '',
+            category: category || '',
+            userName: userName.value || "名無し",
+            isDone: false,
+            doneBy: '',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        }
+    )
+
     await addDoc(
-    collection(
-        db,
-        "groups",
-        groupId.value,
-        "items"
-    ),
-    {
-        name: itemName,
-        quantity: quantity || 1,
-        memo: memo || '',
-        userName: userName.value || "名無し",
-        isDone: false,
-        doneBy: '',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-    }
+        collection(
+            db, 
+            "groups", 
+            groupId.value, 
+            "notifications"
+        ),
+        {
+            type: "item_added",
+            text: `${userName.value} さんが「${itemName}」を追加しました`,
+            addedByUid: user.value.uid,
+            createAt: serverTimestamp()
+        }
     )
     displayToast("🛒  追加しました")
     }
@@ -599,4 +647,33 @@ const goProfile = () => {
 const goGroupSetting = () => {
     router.push(`/group/${groupId.value}/setting`)
 }
+
+// ======================
+// 通知の未読判定
+// ======================
+const hasUnread = computed(() => {
+    return notifications.value.some(n => {
+        if (!n.createAt) return false
+        return n.createAt.toMillis() > lastReadAt.value
+    })
+})
+
+// ======================
+// 通知の未読判定
+// ======================
+const openNotificationPanel = async () => {
+    showNotificationPanel.value = true
+
+    const now = Date.now()
+    lastReadAt.value = now
+    
+    await updateDoc(doc(db, "users", user.value.uid), {
+        [`lastReadNotificationAt.${groupId.value}`]: now
+    })
+}
+
+const closeNotificationPanel = () => {
+    showNotificationPanel.value = false
+}
+
 </script>

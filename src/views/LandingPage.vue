@@ -52,7 +52,7 @@
         <!-- 機能紹介セクション -->
         <section class="px-6 py-12 max-w-4xl mx-auto">
             <h2 class="text-2xl font-black text-green-900 text-center mb-8">主な機能</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div 
                     v-for="feature in  features"
                     :key="feature.title"
@@ -173,7 +173,12 @@ const features = [
     {
         icon: '🔔',
         title: 'アプリ内通知',
-        description: '新しいメンバーが参加するとグループ内にお知らせが表示されます。大事な情報のを見逃しません。',
+        description: '新メンバーの参加・アイテムの追加すると通知でお知らせ。ベルアイコンから未読の内容をいつでも確認できます。',
+    },
+    {
+        icon: '🏷️',
+        title: 'カテゴリー分け',
+        description: '「野菜」「日用品」などカテゴリーごとにリストを整理。お店の売り場ごとに見やすく並びます。',
     },
 ]
 
@@ -192,6 +197,12 @@ const notices = [
         badge: 'アップデート',
         badgeClass: 'bg-emerald-100 text-emerald-700',
         text: 'v1.1.0：LandingPage追加、メール認証、アプリ内通知履歴を追加しました',
+    },
+    {
+        date: '2026.07.15',
+        badge: 'アップデート',
+        badgeClass: 'bg-emerald-100 text-emerald-700',
+        text: 'v1.2.3：新メンバー・新アイテムの追加通知、通知ベル、カテゴリー分け機能を追加しました',
     }
 ]
 
