@@ -18,7 +18,7 @@
                     <span class="text-sm text-gray-500">現在：{{ userName }}</span>
                     <input 
                         v-model="userName"
-                        class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                        class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
                         placeholder="ユーザー名"
                     />
                 </label>
@@ -39,7 +39,7 @@
                     <input 
                         v-model="newEmail"
                         type="email"
-                        class="px-4 py-3 rounded-xl border border-gray-200  bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-2 focus:ring-green-100 transition"
+                        class="px-4 py-3 rounded-xl border border-gray-200  bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-2 focus:ring-green-100 transition"
                         placeholder="メールアドレス"
                     />
                 </label>
@@ -60,7 +60,7 @@
                     <input 
                         v-model="newPassword"
                         type="password"
-                        class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                        class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
                         placeholder="新しいパスワード（６文字以上）"
                     />
                 </label>
@@ -87,7 +87,7 @@
                             v-model="currentPassword"
                             type="password"
                             placeholder="現在のパスワード"
-                            class="px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                            class="px-4 py-3 rounded-xl border border-gray-200 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
                         />
                     </label>
 

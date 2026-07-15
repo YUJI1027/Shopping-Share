@@ -16,7 +16,7 @@
                 <div class="flex gap-2">
                     <input
                         v-model="groupName"
-                        class="flex px-4  py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
+                        class="flex px-4  py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition"
                         placeholder="グループ名"
                     />
 
