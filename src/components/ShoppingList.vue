@@ -1,30 +1,32 @@
 <template>
-    <div class="w-full flex flex-col gap-3">
-        <button 
-            @click="toggleHide" 
-            class="text-sm font-semibold text-gray-600 px-3 py-1.5 rounded-lg hover:bg-green-50 transition cursor-pointer"
-        >
-            {{ hideComplete ? '完了済み表示' : '完了済み非表示' }}
-        </button>
+    <div
+        v-for="(groupItems, category) in groupedItems"
+        :key="category"
+        class="flex flex-col gap-2"
+        
+    >
+        <span class="text-xs font-bold text-gray-500 px-1">
+            {{ category }} ({{ groupItems.length }})
+        </span>
+
+        <transition-group name="list" tag="div" class="flex flex-col gap-3">
+            <ShoppingItem
+                v-for="item in groupItems"
+                :key="item.id"
+                :id="item.id"
+                :name="item.name"
+                :quantity="item.quantity"
+                :memo="item.memo"
+                :isDone="item.isDone"
+                :doneBy="item.doneBy"
+                :userName="item.userName"
+                :createdAt="item.createdAt"
+                @delete-item="handleDelete"
+                @toggle-item="toggleItem"
+                @edit-item="editItem"
+            />
+        </transition-group>
     </div>
-    
-    <transition-group name="list" tag="div" class="flex flex-col gap-3">
-        <ShoppingItem
-            v-for="item in filteredItems"
-            :key="item.id"
-            :id="item.id"
-            :name="item.name"
-            :quantity="item.quantity"
-            :memo="item.memo"
-            :isDone="item.isDone"
-            :doneBy="item.doneBy"
-            :userName="item.userName"
-            :createdAt="item.createdAt"
-            @delete-item="handleDelete"
-            @toggle-item="toggleItem"
-            @edit-item="editItem"
-        />
-    </transition-group>
 </template>
 
 <script setup>
@@ -39,6 +41,7 @@ import ShoppingItem from './ShoppingItem.vue'
 // state
 // =======
 const hideComplete = ref(false)
+const categoryOrder = ['野菜', '肉・魚', '日用品', '飲料', 'お菓子', '調味料', 'その他', '未分類']  //カテゴリーの表示順（固定化）
 
 // ==========================================
 // Home.vueからitemsを受け取るためのpropsを定義
@@ -100,4 +103,29 @@ const filteredItems = computed(() => {
 const editItem =(item) => {
     emit("edit-item", item)
 }
+
+// ==============================
+// カテゴリーごとにグルーピングする
+// ==============================
+const groupedItems = computed(() => {
+    const groups = {}
+
+    for  (const item of filteredItems.value) {
+        const cat = item.category || '未分類'
+        if (!groups[cat]) groups[cat] = []
+            groups[cat].push(item)
+    }
+
+    const sortedEntries = Object.entries(groups).sort(([a], [b]) => {
+        const indexA = categoryOrder.indexOf(a)
+        const indexB = categoryOrder.indexOf(b)
+
+        const posA = indexA === -1 ? categoryOrder.length : indexA
+        const posB = indexB === -1 ? categoryOrder.length : indexB
+
+        return posA - posB
+    })
+
+    return Object.fromEntries(sortedEntries)
+})
 </script>
